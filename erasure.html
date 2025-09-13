@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Data Erasure - CryptoWipe</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/erasure.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="erasure.css">
+    <link rel="stylesheet" href="erasure.js">
+</head>
+<body>
+    <header class="header">
+        <div class="header-particles">
+            <div class="particle particle-1"></div>
+            <div class="particle particle-2"></div>
+            <div class="particle particle-3"></div>
+            <div class="particle particle-4"></div>
+            <div class="particle particle-5"></div>
+            <div class="particle particle-6"></div>
+        </div>
+        <div class="container">
+            <nav class="nav">
+                <div class="nav-brand">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>CryptoWipe</span>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="certificate.html" id="certificateLink" class="hidden">Certificate</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="erasure-main">
+        <div class="container">
+            <div class="erasure-wizard">
+                <!-- Step 1: Configuration -->
+                <div id="step-config" class="step active">
+                    <div class="step-header">
+                        <span class="subtitle">Military-Grade Security</span>
+                        <h1>Configure Secure Erasure</h1>
+                        <p>Set up your data wiping parameters for maximum security</p>
+                    </div>
+
+                    <div class="config-form">
+                        <div class="form-group">
+                            <label for="driveSelect">Select Target Drive/Folder</label>
+                            <div class="drive-selector">
+                                <select id="driveSelect">
+                                    <option value="">Choose drive or folder...</option>
+                                    <option value="C:">C: System Drive (Simulated)</option>
+                                    <option value="D:">D: Data Drive (Simulated)</option>
+                                    <option value="USB">USB Drive (Simulated)</option>
+                                    <option value="folder">Specific Folder (Simulated)</option>
+                                </select>
+                                <i class="fas fa-hard-drive"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="algorithmSelect">Erasure Algorithm</label>
+                            <div class="algorithm-grid">
+                                <div class="algorithm-card active" data-algorithm="aes256">
+                                    <i class="fas fa-lock"></i>
+                                    <h3>AES-256 Cryptographic</h3>
+                                    <p>Military-grade encryption with key destruction</p>
+                                    <span class="security-level high">Highest Security</span>
+                                </div>
+                                <div class="algorithm-card" data-algorithm="dod">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <h3>DoD 5220.22-M</h3>
+                                    <p>3-pass overwrite with verification</p>
+                                    <span class="security-level medium">High Security</span>
+                                </div>
+                                <div class="algorithm-card" data-algorithm="gutmann">
+                                    <i class="fas fa-layer-group"></i>
+                                    <h3>Gutmann 35-Pass</h3>
+                                    <p>Maximum overwrite passes for legacy drives</p>
+                                    <span class="security-level high">Extreme Security</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Additional Options</label>
+                            <div class="options-grid">
+                                <label class="checkbox-card">
+                                    <input type="checkbox" id="verifyWipe" checked>
+                                    <div class="checkbox-content">
+                                        <i class="fas fa-check-double"></i>
+                                        <span>Verify Erasure</span>
+                                    </div>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" id="generateCert" checked>
+                                    <div class="checkbox-content">
+                                        <i class="fas fa-certificate"></i>
+                                        <span>Generate Certificate</span>
+                                    </div>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" id="secureLog">
+                                    <div class="checkbox-content">
+                                        <i class="fas fa-file-alt"></i>
+                                        <span>Detailed Logging</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button id="startErasure" class="btn btn-primary btn-large" disabled>
+                            <i class="fas fa-play"></i>
+                            Begin Secure Erasure
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Progress -->
+                <div id="step-progress" class="step hidden">
+                    <div class="step-header">
+                        <span class="subtitle">Cryptographic Operation</span>
+                        <h1>Secure Erasure in Progress</h1>
+                        <p id="progressStatus">Initializing cryptographic erasure...</p>
+                    </div>
+
+                    <div class="progress-container">
+                        <div class="main-progress">
+                            <div class="progress-circle">
+                                <svg class="progress-ring" width="200" height="200">
+                                    <circle class="progress-ring-bg" cx="100" cy="100" r="85"></circle>
+                                    <circle class="progress-ring-progress" cx="100" cy="100" r="85"></circle>
+                                </svg>
+                                <div class="progress-text">
+                                    <span id="progressPercent">0%</span>
+                                    <span id="progressLabel">Starting</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="progress-phases">
+                            <div class="phase" id="phase-encrypt">
+                                <div class="phase-icon">
+                                    <i class="fas fa-lock"></i>
+                                </div>
+                                <div class="phase-content">
+                                    <h3>Data Encryption</h3>
+                                    <p>Encrypting all data with AES-256</p>
+                                    <div class="phase-progress">
+                                        <div class="phase-bar"></div>
+                                    </div>
+                                </div>
+                                <div class="phase-status">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+
+                            <div class="phase" id="phase-overwrite">
+                                <div class="phase-icon">
+                                    <i class="fas fa-eraser"></i>
+                                </div>
+                                <div class="phase-content">
+                                    <h3>Secure Overwriting</h3>
+                                    <p>Multiple pass overwrite with random data</p>
+                                    <div class="phase-progress">
+                                        <div class="phase-bar"></div>
+                                    </div>
+                                </div>
+                                <div class="phase-status">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+
+                            <div class="phase" id="phase-destroy">
+                                <div class="phase-icon">
+                                    <i class="fas fa-key"></i>
+                                </div>
+                                <div class="phase-content">
+                                    <h3>Key Destruction</h3>
+                                    <p>Securely destroying encryption keys</p>
+                                    <div class="phase-progress">
+                                        <div class="phase-bar"></div>
+                                    </div>
+                                </div>
+                                <div class="phase-status">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+
+                            <div class="phase" id="phase-verify">
+                                <div class="phase-icon">
+                                    <i class="fas fa-check-double"></i>
+                                </div>
+                                <div class="phase-content">
+                                    <h3>Verification</h3>
+                                    <p>Verifying complete data destruction</p>
+                                    <div class="phase-progress">
+                                        <div class="phase-bar"></div>
+                                    </div>
+                                </div>
+                                <div class="phase-status">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+                        </div>
+
+<div class="stats-grid">
+                            <div class="stat-card">
+                                <i class="fas fa-database"></i>
+                                <div class="stat-content">
+                                    <span class="stat-value" id="dataSizeValue">0 GB</span>
+                                    <span class="stat-label">Data Processed</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-clock"></i>
+                                <div class="stat-content">
+                                    <span class="stat-value" id="elapsedTime">00:00</span>
+                                    <span class="stat-label">Elapsed Time</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <div class="stat-content">
+                                    <span class="stat-value" id="throughput">0 MB/s</span>
+                                    <span class="stat-label">Throughput</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="log-container">
+                        <h3>Real-time Log</h3>
+                        <div id="logOutput" class="log-output"></div>
+                    </div>
+
+                    <button id="emergencyStop" class="btn btn-danger">
+                        <i class="fas fa-stop"></i>
+                        Emergency Stop
+                    </button>
+                </div>
+
+                <!-- Step 3: Completion -->
+                <div id="step-complete" class="step hidden">
+                    <div class="completion-success">
+                        <div class="success-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <span class="subtitle">Mission Accomplished</span>
+                        <h1>Erasure Complete!</h1>
+                        <p>Your data has been securely wiped using cryptographic erasure</p>
+                    </div>
+
+                    <div class="completion-summary">
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <i class="fas fa-shield-alt"></i>
+                                <div>
+                                    <h3>Security Level</h3>
+                                    <span id="summaryAlgorithm">AES-256 Cryptographic</span>
+                                </div>
+                            </div>
+                            <div class="summary-item">
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <h3>Total Time</h3>
+                                    <span id="summaryTime">2:34</span>
+                                </div>
+                            </div>
+                            <div class="summary-item">
+                                <i class="fas fa-database"></i>
+                                <div>
+                                    <h3>Data Erased</h3>
+                                    <span id="summarySize">256.7 GB</span>
+                                </div>
+                            </div>
+                            <div class="summary-item">
+                                <i class="fas fa-calendar"></i>
+                                <div>
+                                    <h3>Completion Time</h3>
+                                    <span id="summaryTimestamp">Now</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="completion-actions">
+                        <a href="certificate.html" class="btn btn-primary btn-large" id="viewCertificate">
+                            <i class="fas fa-certificate"></i>
+                            View Certificate
+                        </a>
+                        <button onclick="window.location.href='erasure.html'" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i>
+                            Wipe More Data
+                        </button>
+                        <button id="downloadLog" class="btn btn-outline">
+                            <i class="fas fa-download"></i>
+                            Download Log
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="confirmationModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Confirm Secure Erasure</h2>
+            <p><strong>Warning:</strong> This action will permanently destroy all data on the selected target. This process cannot be undone.</p>
+            
+            <div class="confirmation-details">
+                <div class="detail-item">
+                    <strong>Target:</strong> <span id="confirmTarget">-</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Algorithm:</strong> <span id="confirmAlgorithm">-</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Estimated Size:</strong> <span id="confirmSize">-</span>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button id="confirmErasure" class="btn btn-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Confirm Erasure
+                </button>
+                <button id="cancelErasure" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/erasure.js"></script>
+</body>
+</html>

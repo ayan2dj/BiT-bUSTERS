@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoWipe - Function Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .test-result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .pass { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .fail { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        button { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; background: #667eea; color: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>CryptoWipe - Functionality Test</h1>
+    <p>Testing key JavaScript functions...</p>
+    
+    <div id="test-results"></div>
+    
+    <button onclick="runTests()">Run Tests</button>
+    <button onclick="window.location.href='index.html'">Back to Main Site</button>
+
+    <script>
+        // Import key functions from erasure.js (simplified versions)
+        function generateCertificateId() {
+            return 'CERT-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+        }
+
+        function generateSecureHash() {
+            return Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function formatDuration(ms) {
+            const minutes = Math.floor(ms / 60000);
+            const seconds = Math.floor((ms % 60000) / 1000);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function runTests() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '';
+
+            const tests = [
+                {
+                    name: 'Certificate ID Generation',
+                    test: () => {
+                        const id = generateCertificateId();
+                        return id && id.startsWith('CERT-') && id.length > 10;
+                    }
+                },
+                {
+                    name: 'Secure Hash Generation',
+                    test: () => {
+                        const hash = generateSecureHash();
+                        return hash && hash.length === 64 && /^[a-f0-9]+$/.test(hash);
+                    }
+                },
+                {
+                    name: 'Duration Formatting',
+                    test: () => {
+                        const formatted = formatDuration(125000); // 2:05
+                        return formatted === '2:05';
+                    }
+                },
+                {
+                    name: 'Crypto API Available',
+                    test: () => {
+                        return typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function';
+                    }
+                },
+                {
+                    name: 'LocalStorage Available',
+                    test: () => {
+                        try {
+                            localStorage.setItem('test', 'test');
+                            localStorage.removeItem('test');
+                            return true;
+                        } catch (e) {
+                            return false;
+                        }
+                    }
+                },
+                {
+                    name: 'Modern JavaScript Support',
+                    test: () => {
+                        try {
+                            // Test arrow functions, const/let, template literals
+                            const testFunc = () => `test${1 + 1}`;
+                            return testFunc() === 'test2';
+                        } catch (e) {
+                            return false;
+                        }
+                    }
+                }
+            ];
+
+            tests.forEach(test => {
+                const result = document.createElement('div');
+                result.className = 'test-result';
+                
+                try {
+                    const passed = test.test();
+                    result.className += passed ? ' pass' : ' fail';
+                    result.textContent = `${test.name}: ${passed ? 'PASS' : 'FAIL'}`;
+                } catch (error) {
+                    result.className += ' fail';
+                    result.textContent = `${test.name}: FAIL (${error.message})`;
+                }
+                
+                results.appendChild(result);
+            });
+        }
+
+        // Run tests on page load
+        window.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html>

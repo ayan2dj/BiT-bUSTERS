@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate of Secure Data Erasure - CryptoWipe</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/certificate.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="certificate.css">
+    <link rel="stylesheet" href="certificate.js">
+    <link rel="stylesheet" href="test.html">
+</head>
+<body>
+    <header class="header">
+        <div class="header-particles">
+            <div class="particle particle-1"></div>
+            <div class="particle particle-2"></div>
+            <div class="particle particle-3"></div>
+            <div class="particle particle-4"></div>
+            <div class="particle particle-5"></div>
+            <div class="particle particle-6"></div>
+        </div>
+        <div class="container">
+            <nav class="nav">
+                <div class="nav-brand">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>CryptoWipe</span>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="erasure.html">Erasure</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="certificate-main">
+        <div class="container">
+            <div class="certificate-card" id="certificateCard">
+                <div class="certificate-header">
+                    <div class="certificate-title">
+                        <span class="cert-subtitle">Verifiable Proof</span>
+                        <h1>Certificate of Secure Data Erasure</h1>
+                        <p>Issued by CryptoWipe</p>
+                    </div>
+                    <div class="certificate-badge">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                </div>
+
+                <div class="certificate-body">
+                    <div class="certificate-section">
+                        <h3>Certificate Details</h3>
+                        <div class="details-grid">
+                            <div class="detail">
+                                <span class="label">Certificate ID</span>
+                                <span class="value" id="certId">-</span>
+                            </div>
+                            <div class="detail">
+                                <span class="label">Issued At</span>
+                                <span class="value" id="certIssuedAt">-</span>
+                            </div>
+                            <div class="detail">
+                                <span class="label">Target</span>
+                                <span class="value" id="certTarget">-</span>
+                            </div>
+                            <div class="detail">
+                                <span class="label">Algorithm</span>
+                                <span class="value" id="certAlgorithm">-</span>
+                            </div>
+                            <div class="detail">
+                                <span class="label">Data Size</span>
+                                <span class="value" id="certSize">-</span>
+                            </div>
+                            <div class="detail">
+                                <span class="label">Duration</span>
+                                <span class="value" id="certDuration">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="certificate-section">
+                        <h3>Cryptographic Proof</h3>
+                        <div class="proof-grid">
+                            <div class="detail">
+                                <span class="label">Erasure Hash</span>
+                                <span class="value" id="certHash">-</span>
+                            </div>
+                            <div class="detail">
+                                <span class="label">Signature</span>
+                                <span class="value" id="certSignature">-</span>
+                            </div>
+                            <div class="detail">
+                                <span class="label">Public Key</span>
+                                <span class="value" id="certPublicKey">-</span>
+                            </div>
+                        </div>
+                        <p class="small">This certificate includes a verifiable signature generated using the Web Crypto API. Verification can be performed offline.</p>
+                    </div>
+
+                    <div class="certificate-section">
+                        <h3>Attestation</h3>
+                        <p>
+                            This certificate attests that all data on the specified target was securely erased using cryptographic erasure techniques.
+                            Encryption keys were generated using a cryptographically secure pseudorandom number generator and destroyed upon completion,
+                            rendering the original data permanently unrecoverable.
+                        </p>
+                    </div>
+
+                    <div class="certificate-footer">
+                        <div class="signature-block">
+                            <div class="signature-line"></div>
+                            <span class="signature-label">Authorized by CryptoWipe</span>
+                        </div>
+                        <div class="qr-block" id="qrBlock">
+                            <canvas id="qrCanvas" width="100" height="100"></canvas>
+                            <span class="small">Scan to verify certificate</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="certificate-actions">
+                <button id="downloadPdf" class="btn btn-primary">
+                    <i class="fas fa-file-pdf"></i>
+                    Download PDF
+                </button>
+                <button id="copyLink" class="btn btn-secondary">
+                    <i class="fas fa-link"></i>
+                    Copy Shareable Link
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/certificate.js"></script>
+</body>
+</html>
