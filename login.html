@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Bit Busters</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      background: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    .login-card {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-width: 350px;
+      width: 90%;
+    }
+
+    .login-card h1 {
+      margin-bottom: 1rem;
+    }
+
+    .login-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .google-btn {
+      background: #fff;
+      border: 1px solid #ccc;
+    }
+
+    .google-btn:hover {
+      background: #f4f4f4;
+    }
+
+    .github-btn {
+      background: #24292f;
+      color: white;
+    }
+
+    .github-btn:hover {
+      background: #000000;
+    }
+
+    a.back-home {
+      display: inline-block;
+      margin-top: 1rem;
+      text-decoration: none;
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <h1>Login</h1>
+      <p>Sign in to continue to Bit Busters</p>
+
+      <!-- Google Login -->
+      <button class="login-btn google-btn" onclick="loginWithGoogle()">
+        <i class="fab fa-google"></i> Continue with Google
+      </button>
+
+      <!-- GitHub Login -->
+      <button class="login-btn github-btn" onclick="loginWithGitHub()">
+        <i class="fab fa-github"></i> Continue with GitHub
+      </button>
+
+      <a href="index.html" class="back-home">← Back to Home</a>
+    </div>
+  </div>
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
+    // Google OAuth2 (requires setting up Google Cloud Client ID)
+    function loginWithGoogle() {
+      alert("Google Sign-In integration goes here (use Google Identity Services).");
+      // Example:
+      // google.accounts.id.initialize({ client_id: "YOUR_CLIENT_ID", callback: handleResponse });
+      // google.accounts.id.prompt();
+    }
+
+    // GitHub OAuth (redirect to GitHub OAuth page)
+    function loginWithGitHub() {
+      const clientID = "YOUR_GITHUB_CLIENT_ID";
+      const redirectURI = window.location.origin + "/callback.html";
+      window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientID}&redirect_uri=${redirectURI}&scope=read:user`;
+    }
+  </script>
+</body>
+</html>
