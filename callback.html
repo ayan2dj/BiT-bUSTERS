@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login Callback | Bit Busters</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: var(--bg-light);
+      color: var(--text-light);
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    .callback-box {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .callback-box h1 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .callback-box p {
+      font-size: 1rem;
+      margin: 0.5rem 0;
+    }
+
+    a.back-home {
+      display: inline-block;
+      margin-top: 1rem;
+      text-decoration: none;
+      color: var(--accent);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="callback-box">
+    <h1 id="status-message">Processing login...</h1>
+    <p id="details"></p>
+    <a href="index.html" class="back-home">← Back to Home</a>
+  </div>
+
+  <script>
+    // Parse URL query parameters
+    const params = new URLSearchParams(window.location.search);
+    const statusMessage = document.getElementById('status-message');
+    const details = document.getElementById('details');
+
+    if (params.has('code')) {
+      // OAuth returned a code successfully
+      statusMessage.textContent = "✅ Login Successful!";
+      details.textContent = "We received the authorization code. Now exchange it for a token on your backend.";
+    } else if (params.has('error')) {
+      statusMessage.textContent = "❌ Login Failed";
+      details.textContent = `Reason: ${params.get('error_description') || params.get('error')}`;
+    } else {
+      statusMessage.textContent = "⚠️ No OAuth response received.";
+      details.textContent = "Please try logging in again.";
+    }
+  </script>
+</body>
+</html>
