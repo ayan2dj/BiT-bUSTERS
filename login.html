@@ -1,112 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login | Bit Busters</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    .login-container {
+    body {
+      font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      text-align: center;
-      background: var(--bg-light);
-      color: var(--text-light);
+      margin: 0;
+      background-color: #f4f4f4;
     }
-
-    .login-card {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      max-width: 350px;
-      width: 90%;
+    h1 {
+      margin-bottom: 20px;
     }
-
-    .login-card h1 {
-      margin-bottom: 1rem;
-    }
-
-    .login-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      width: 100%;
-      padding: 0.8rem;
-      margin: 0.5rem 0;
+    button, .g_id_signin {
+      margin: 10px;
+      padding: 12px 20px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       font-size: 1rem;
-      font-weight: bold;
     }
-
-    .google-btn {
-      background: #fff;
-      border: 1px solid #ccc;
-    }
-
-    .google-btn:hover {
-      background: #f4f4f4;
-    }
-
     .github-btn {
-      background: #24292f;
+      background: #24292e;
       color: white;
     }
-
-    .github-btn:hover {
-      background: #000000;
-    }
-
-    a.back-home {
-      display: inline-block;
-      margin-top: 1rem;
-      text-decoration: none;
-      color: var(--accent);
+    .logout-btn {
+      background: crimson;
+      color: white;
+      display: none;
     }
   </style>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-  <div class="login-container">
-    <div class="login-card">
-      <h1>Login</h1>
-      <p>Sign in to continue to Bit Busters</p>
 
-      <!-- Google Login -->
-      <button class="login-btn google-btn" onclick="loginWithGoogle()">
-        <i class="fab fa-google"></i> Continue with Google
-      </button>
+  <h1 id="welcome-text">Login to Bit Busters</h1>
 
-      <!-- GitHub Login -->
-      <button class="login-btn github-btn" onclick="loginWithGitHub()">
-        <i class="fab fa-github"></i> Continue with GitHub
-      </button>
-
-      <a href="index.html" class="back-home">← Back to Home</a>
+  <div id="login-section">
+    <!-- Google Sign-In Button -->
+    <div id="g_id_onload"
+         data-client_id="YOUR_GOOGLE_CLIENT_ID"
+         data-callback="handleGoogleSignIn">
     </div>
+    <div class="g_id_signin" data-type="standard"></div>
+
+    <!-- GitHub Login Button -->
+    <button class="github-btn" onclick="loginWithGithub()">Login with GitHub</button>
   </div>
 
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- Logout Button -->
+  <button id="logout-btn" class="logout-btn" onclick="logout()">Logout</button>
+
   <script>
-    // Google OAuth2 (requires setting up Google Cloud Client ID)
-    function loginWithGoogle() {
-      alert("Google Sign-In integration goes here (use Google Identity Services).");
-      // Example:
-      // google.accounts.id.initialize({ client_id: "YOUR_CLIENT_ID", callback: handleResponse });
-      // google.accounts.id.prompt();
+    // Show user if logged in
+    document.addEventListener("DOMContentLoaded", () => {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user) {
+        document.getElementById("welcome-text").innerText = `Welcome, ${user.name || user.login}`;
+        document.getElementById("login-section").style.display = "none";
+        document.getElementById("logout-btn").style.display = "block";
+      }
+    });
+
+    function loginWithGithub() {
+      window.location.href = `https://github.com/login/oauth/authorize?client_id=YOUR_GITHUB_CLIENT_ID&scope=user&redirect_uri=http://localhost:3000/callback.html`;
     }
 
-    // GitHub OAuth (redirect to GitHub OAuth page)
-    function loginWithGitHub() {
-      const clientID = "YOUR_GITHUB_CLIENT_ID";
-      const redirectURI = window.location.origin + "/callback.html";
-      window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientID}&redirect_uri=${redirectURI}&scope=read:user`;
+    async function handleGoogleSignIn(response) {
+      const res = await fetch("/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: response.credential })
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem("user", JSON.stringify({ name: data.user.name, email: data.user.email }));
+        location.reload(); // reload page to show welcome + logout button
+      } else {
+        alert("❌ Google Login Failed");
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem("user");
+      location.reload();
     }
   </script>
 </body>
