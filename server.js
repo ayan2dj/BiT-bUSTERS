@@ -1,95 +1,84 @@
-// server.js
-const express = require("express");
-const fetch = require("node-fetch");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const { OAuth2Client } = require("google-auth-library");
+import express from "express";
+import fetch from "node-fetch";
+import cors from "cors";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
-
 const app = express();
-app.use(express.json());
 app.use(cors());
-app.use(express.static("public")); // serves login.html, callback.html, etc.
+app.use(express.json());
 
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+// To serve your frontend files (login.html etc.)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use(express.static(path.join(__dirname, "public")));
 
-/**
- * ===========================
- * GITHUB OAUTH FLOW
- * ===========================
- */
-app.get("/auth/github/callback", async (req, res) => {
+// ---------------- GOOGLE OAUTH ----------------
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const REDIRECT_URI = "https://bit-busters.vercel.app/";
+
+// Step 1: Redirect to Google's OAuth consent screen
+app.get("/auth/google", (req, res) => {
+  const authURL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(
+    REDIRECT_URI
+  )}&response_type=code&scope=openid%20email%20profile`;
+  res.redirect(authURL);
+});
+
+// Step 2: Handle Google OAuth callback
+app.get("/auth/google/callback", async (req, res) => {
   const code = req.query.code;
-  if (!code) {
-    return res.json({ success: false, message: "No code provided" });
-  }
+  if (!code) return res.status(400).send("Missing OAuth code");
 
   try {
-    // Step 1: Exchange code for access token
-    const tokenResponse = await fetch("https://github.com/login/oauth/access_token", {
+    // Exchange code for access token
+    const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify({
-        client_id: process.env.GITHUB_CLIENT_ID,
-        client_secret: process.env.GITHUB_CLIENT_SECRET,
-        code
-      })
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        code,
+        client_id: GOOGLE_CLIENT_ID,
+        client_secret: GOOGLE_CLIENT_SECRET,
+        redirect_uri: REDIRECT_URI,
+        grant_type: "authorization_code",
+      }),
     });
 
     const tokenData = await tokenResponse.json();
-    if (!tokenData.access_token) {
-      return res.json({ success: false, message: "Failed to get access token" });
+    if (tokenData.error) {
+      return res.status(400).json({ error: tokenData.error });
     }
 
-    const accessToken = tokenData.access_token;
-
-    // Step 2: Fetch user data
-    const userResponse = await fetch("https://api.github.com/user", {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
-    const userData = await userResponse.json();
-
-    res.json({ success: true, user: userData });
-
-  } catch (error) {
-    console.error("GitHub OAuth Error:", error);
-    res.json({ success: false, message: "GitHub login failed" });
-  }
-});
-
-/**
- * ===========================
- * GOOGLE OAUTH FLOW
- * ===========================
- */
-app.post("/auth/google", async (req, res) => {
-  const token = req.body.token;
-  if (!token) return res.json({ success: false, message: "No token provided" });
-
-  try {
-    const ticket = await googleClient.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID
-    });
-
-    const payload = ticket.getPayload();
-    res.json({
-      success: true,
-      user: {
-        name: payload.name,
-        email: payload.email,
-        picture: payload.picture
+    // Get user info
+    const userInfoResponse = await fetch(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+      {
+        headers: { Authorization: `Bearer ${tokenData.access_token}` },
       }
-    });
-  } catch (error) {
-    console.error("Google Auth Error:", error);
-    res.json({ success: false, message: "Google login failed" });
+    );
+    const user = await userInfoResponse.json();
+
+    // Redirect to frontend with user data stored in localStorage
+    const redirectHTML = `
+      <script>
+        localStorage.setItem("user", JSON.stringify(${JSON.stringify(user)}));
+        window.location.href = "/";
+      </script>
+    `;
+    res.send(redirectHTML);
+  } catch (err) {
+    console.error("Google OAuth error:", err);
+    res.status(500).send("OAuth Failed");
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server running at http://localhost:${PORT}`));
+// ---------------- DEFAULT ROUTE ----------------
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "login.html"));
+});
+
+const PORT = 5500;
+app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
