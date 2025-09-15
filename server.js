@@ -1,84 +1,103 @@
+// server.js
 import express from "express";
-import fetch from "node-fetch";
-import cors from "cors";
+import session from "express-session";
+import passport from "passport";
+import { Strategy as GitHubStrategy } from "passport-github2";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
 
 dotenv.config();
+
 const app = express();
-app.use(cors());
-app.use(express.json());
 
-// To serve your frontend files (login.html etc.)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use(express.static(path.join(__dirname, "public")));
+// --- SESSION SETUP ---
+app.use(session({
+  secret: process.env.SESSION_SECRET || "supersecret",
+  resave: false,
+  saveUninitialized: false
+}));
 
-// ---------------- GOOGLE OAUTH ----------------
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const REDIRECT_URI = "https://bit-busters.vercel.app/";
+// --- PASSPORT SETUP ---
+app.use(passport.initialize());
+app.use(passport.session());
 
-// Step 1: Redirect to Google's OAuth consent screen
-app.get("/auth/google", (req, res) => {
-  const authURL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(
-    REDIRECT_URI
-  )}&response_type=code&scope=openid%20email%20profile`;
-  res.redirect(authURL);
-});
+// --- SERIALIZE USER ---
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((obj, done) => done(null, obj));
 
-// Step 2: Handle Google OAuth callback
-app.get("/auth/google/callback", async (req, res) => {
-  const code = req.query.code;
-  if (!code) return res.status(400).send("Missing OAuth code");
+/* ==========================
+   GITHUB STRATEGY
+========================== */
+passport.use(new GitHubStrategy({
+  clientID: process.env.GITHUB_CLIENT_ID,
+  clientSecret: process.env.GITHUB_CLIENT_SECRET,
+  callbackURL: "http://127.0.0.1:5500/auth/github/callback"
+}, (accessToken, refreshToken, profile, done) => {
+  return done(null, profile);
+}));
 
-  try {
-    // Exchange code for access token
-    const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        code,
-        client_id: GOOGLE_CLIENT_ID,
-        client_secret: GOOGLE_CLIENT_SECRET,
-        redirect_uri: REDIRECT_URI,
-        grant_type: "authorization_code",
-      }),
-    });
+/* ==========================
+   GOOGLE STRATEGY
+========================== */
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: process.env.GOOGLE_CALLBACK_URL
+}, (accessToken, refreshToken, profile, done) => {
+  return done(null, profile);
+}));
 
-    const tokenData = await tokenResponse.json();
-    if (tokenData.error) {
-      return res.status(400).json({ error: tokenData.error });
-    }
+/* ==========================
+   ROUTES
+========================== */
 
-    // Get user info
-    const userInfoResponse = await fetch(
-      "https://www.googleapis.com/oauth2/v3/userinfo",
-      {
-        headers: { Authorization: `Bearer ${tokenData.access_token}` },
-      }
-    );
-    const user = await userInfoResponse.json();
-
-    // Redirect to frontend with user data stored in localStorage
-    const redirectHTML = `
-      <script>
-        localStorage.setItem("user", JSON.stringify(${JSON.stringify(user)}));
-        window.location.href = "/";
-      </script>
-    `;
-    res.send(redirectHTML);
-  } catch (err) {
-    console.error("Google OAuth error:", err);
-    res.status(500).send("OAuth Failed");
-  }
-});
-
-// ---------------- DEFAULT ROUTE ----------------
+// Home route (basic test page)
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "login.html"));
+  res.send(`
+    <h1>Bit Busters OAuth</h1>
+    <p>Choose a login method:</p>
+    <a href="/auth/github">Login with GitHub</a><br><br>
+    <a href="/auth/google">Login with Google</a>
+  `);
 });
 
-const PORT = 5500;
-app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
+/* --- GitHub OAuth Routes --- */
+app.get("/auth/github",
+  passport.authenticate("github", { scope: ["user:email"] })
+);
+
+app.get("/auth/github/callback",
+  passport.authenticate("github", { failureRedirect: "/" }),
+  (req, res) => {
+    res.json({
+      message: "GitHub login successful",
+      user: req.user
+    });
+  }
+);
+
+/* --- Google OAuth Routes --- */
+app.get("/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+app.get("/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/" }),
+  (req, res) => {
+    res.json({
+      message: "Google login successful",
+      user: req.user
+    });
+  }
+);
+
+// Logout route
+app.get("/logout", (req, res) => {
+  req.logout(() => {
+    req.session.destroy();
+    res.redirect("/");
+  });
+});
+
+// Start server
+app.listen(5500, () => console.log("🚀 Server running on http://127.0.0.1:5500"));
