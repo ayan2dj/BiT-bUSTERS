@@ -5,10 +5,19 @@ import passport from "passport";
 import { Strategy as GitHubStrategy } from "passport-github2";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
 const app = express();
+
+// __dirname fix for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static website files from "public" folder
+app.use(express.static(path.join(__dirname, "public")));
 
 // --- SESSION SETUP ---
 app.use(session({
@@ -21,7 +30,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// --- SERIALIZE USER ---
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
@@ -51,17 +59,9 @@ passport.use(new GoogleStrategy({
    ROUTES
 ========================== */
 
-// Home route (basic test page)
-app.get("/", (req, res) => {
-  res.send(`
-    <h1>Bit Busters OAuth</h1>
-    <p>Choose a login method:</p>
-    <a href="/auth/github">Login with GitHub</a><br><br>
-    <a href="/auth/google">Login with Google</a>
-  `);
-});
+// If user visits "/" we serve index.html automatically from public/
+// (no need for res.send here)
 
-/* --- GitHub OAuth Routes --- */
 app.get("/auth/github",
   passport.authenticate("github", { scope: ["user:email"] })
 );
@@ -69,14 +69,10 @@ app.get("/auth/github",
 app.get("/auth/github/callback",
   passport.authenticate("github", { failureRedirect: "/" }),
   (req, res) => {
-    res.json({
-      message: "GitHub login successful",
-      user: req.user
-    });
+    res.redirect("/profile.html");
   }
 );
 
-/* --- Google OAuth Routes --- */
 app.get("/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
@@ -84,20 +80,24 @@ app.get("/auth/google",
 app.get("/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
-    res.json({
-      message: "Google login successful",
-      user: req.user
-    });
+    res.redirect("/profile.html");
   }
 );
 
-// Logout route
+// API route to get logged-in user data (for profile page)
+app.get("/api/user", (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Not logged in" });
+  res.json(req.user);
+});
+
+// Logout
 app.get("/logout", (req, res) => {
   req.logout(() => {
-    req.session.destroy();
-    res.redirect("/");
+    req.session.destroy(() => {
+      res.redirect("/");
+    });
   });
 });
 
 // Start server
-app.listen(5500, () => console.log("🚀 Server running on http://127.0.0.1:5500"));
+app.listen(5500, () => console.log("🚀 Server running at http://127.0.0.1:5500"));
