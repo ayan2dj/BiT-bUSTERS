@@ -8,88 +8,92 @@
     body {
       font-family: Arial, sans-serif;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      background: #f4f4f4;
       margin: 0;
-      background-color: #f4f4f4;
+    }
+    .login-container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 320px;
     }
     h1 {
       margin-bottom: 20px;
+      font-size: 1.8rem;
+      color: #333;
     }
-    button, .g_id_signin {
-      margin: 10px;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
       font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
     }
-    .github-btn {
-      background: #24292e;
+    .btn-github {
+      background: #24292f;
       color: white;
     }
-    .logout-btn {
-      background: crimson;
-      color: white;
-      display: none;
+    .btn-github:hover {
+      background: #333a42;
+    }
+    .btn-google {
+      background: white;
+      color: #444;
+      border: 1px solid #ddd;
+    }
+    .btn-google:hover {
+      background: #f8f8f8;
+    }
+    .btn img {
+      width: 20px;
+      height: 20px;
+    }
+    .note {
+      font-size: 0.85rem;
+      color: #555;
+      margin-top: 10px;
     }
   </style>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-
-  <h1 id="welcome-text">Login to Bit Busters</h1>
-
-  <div id="login-section">
-    <!-- Google Sign-In Button -->
-    <div id="g_id_onload"
-         data-client_id="YOUR_GOOGLE_CLIENT_ID"
-         data-callback="handleGoogleSignIn">
-    </div>
-    <div class="g_id_signin" data-type="standard"></div>
+  <div class="login-container">
+    <h1>Welcome Back</h1>
 
     <!-- GitHub Login Button -->
-    <button class="github-btn" onclick="loginWithGithub()">Login with GitHub</button>
+    <button class="btn btn-github" onclick="loginWithGitHub()">
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733553.png" alt="GitHub Logo">
+      Continue with GitHub
+    </button>
+
+    <!-- Google Login Button -->
+    <button class="btn btn-google" onclick="loginWithGoogle()">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Google_%22G%22_Logo.svg" alt="Google Logo">
+      Continue with Google
+    </button>
+
+    <p class="note">By logging in, you agree to our terms of service.</p>
   </div>
 
-  <!-- Logout Button -->
-  <button id="logout-btn" class="logout-btn" onclick="logout()">Logout</button>
-
   <script>
-    // Show user if logged in
-    document.addEventListener("DOMContentLoaded", () => {
-      const user = JSON.parse(localStorage.getItem("user"));
-      if (user) {
-        document.getElementById("welcome-text").innerText = `Welcome, ${user.name || user.login}`;
-        document.getElementById("login-section").style.display = "none";
-        document.getElementById("logout-btn").style.display = "block";
-      }
-    });
-
-    function loginWithGithub() {
-      window.location.href = `https://github.com/login/oauth/authorize?client_id=YOUR_GITHUB_CLIENT_ID&scope=user&redirect_uri=http://localhost:3000/callback.html`;
+    function loginWithGitHub() {
+      window.location.href = "/auth/github";
     }
 
-    async function handleGoogleSignIn(response) {
-      const res = await fetch("/auth/google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: response.credential })
-      });
-      const data = await res.json();
-      if (data.success) {
-        localStorage.setItem("user", JSON.stringify({ name: data.user.name, email: data.user.email }));
-        location.reload(); // reload page to show welcome + logout button
-      } else {
-        alert("❌ Google Login Failed");
-      }
-    }
-
-    function logout() {
-      localStorage.removeItem("user");
-      location.reload();
+    function loginWithGoogle() {
+      window.location.href = "/auth/google";
     }
   </script>
 </body>
