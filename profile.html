@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile | Bit Busters</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+    .profile-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      text-align: center;
+      width: 300px;
+    }
+    .profile-pic {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+    .logout-btn {
+      background: crimson;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-card" id="profile-card">
+    <h2>Loading...</h2>
+  </div>
+
+ <script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      const response = await fetch("/api/user");
+      if (!response.ok) {
+        // Not logged in → redirect to login page
+        window.location.href = "/login.html";
+        return;
+      }
+
+      const user = await response.json();
+
+      document.getElementById("profile-card").innerHTML = `
+        <img src="${user.photos?.[0]?.value || 'https://via.placeholder.com/100'}" class="profile-pic" alt="User Avatar">
+        <h2>${user.displayName || user.username || "Anonymous"}</h2>
+        ${user.emails ? `<p><strong>Email:</strong> ${user.emails[0].value}</p>` : ""}
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      `;
+    } catch (err) {
+      console.error("Failed to fetch user:", err);
+      window.location.href = "/login.html";
+    }
+  });
+
+  function logout() {
+    window.location.href = "/logout"; // Calls backend logout route
+  }
+</script>
+
+</body>
+</html>
