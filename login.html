@@ -8,93 +8,70 @@
     body {
       font-family: Arial, sans-serif;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       height: 100vh;
-      background: #f4f4f4;
       margin: 0;
+      background: #f4f4f4;
     }
-    .login-container {
+    .login-card {
       background: white;
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       text-align: center;
-      width: 320px;
+      width: 300px;
     }
     h1 {
       margin-bottom: 20px;
-      font-size: 1.8rem;
-      color: #333;
     }
-    .btn {
+    .login-btn {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
       width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      font-size: 1rem;
-      border-radius: 8px;
+      padding: 10px;
+      margin: 10px 0;
       border: none;
+      border-radius: 8px;
+      font-size: 1rem;
       cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s ease;
+      transition: 0.3s;
     }
-    .btn-github {
+    .login-btn img {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+    }
+    .github-btn {
       background: #24292f;
       color: white;
     }
-    .btn-github:hover {
-      background: #333a42;
+    .github-btn:hover {
+      background: #333;
     }
-    .btn-google {
+    .google-btn {
       background: white;
-      color: #444;
-      border: 1px solid #ddd;
+      border: 1px solid #ccc;
+      color: #333;
     }
-    .btn-google:hover {
-      background: #f8f8f8;
-    }
-    .btn img {
-      width: 20px;
-      height: 20px;
-    }
-    .note {
-      font-size: 0.85rem;
-      color: #555;
-      margin-top: 10px;
+    .google-btn:hover {
+      background: #f0f0f0;
     }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h1>Welcome Back</h1>
-
-    <!-- GitHub Login Button -->
-    <button class="btn btn-github" onclick="loginWithGitHub()">
-      <img src="https://cdn-icons-png.flaticon.com/512/733/733553.png" alt="GitHub Logo">
-      Continue with GitHub
+  <div class="login-card">
+    <h1>Login</h1>
+    <button class="login-btn github-btn" onclick="window.location.href='/auth/github'">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub">
+      Login with GitHub
     </button>
-
-    <!-- Google Login Button -->
-    <button class="btn btn-google" onclick="loginWithGoogle()">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Google_%22G%22_Logo.svg" alt="Google Logo">
-      Continue with Google
+    <button class="login-btn google-btn" onclick="window.location.href='/auth/google'">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
+      Login with Google
     </button>
-
-    <p class="note">By logging in, you agree to our terms of service.</p>
   </div>
-
-  <script>
-    function loginWithGitHub() {
-      window.location.href = "/auth/github";
-    }
-
-    function loginWithGoogle() {
-      window.location.href = "/auth/google";
-    }
-  </script>
 </body>
 </html>
