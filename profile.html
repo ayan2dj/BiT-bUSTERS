@@ -46,34 +46,29 @@
     <h2>Loading...</h2>
   </div>
 
- <script>
-  document.addEventListener("DOMContentLoaded", async () => {
-    try {
-      const response = await fetch("/api/user");
-      if (!response.ok) {
-        // Not logged in → redirect to login page
+  <script>
+    async function loadProfile() {
+      try {
+        const res = await fetch("/api/user");
+        if (!res.ok) {
+          window.location.href = "/login.html";
+          return;
+        }
+
+        const user = await res.json();
+        document.getElementById("profile-card").innerHTML = `
+          <img src="${user.photos?.[0]?.value || 'https://via.placeholder.com/100'}" class="profile-pic" alt="User Avatar">
+          <h2>${user.displayName || user.username || "User"}</h2>
+          ${user.emails?.[0]?.value ? `<p><strong>Email:</strong> ${user.emails[0].value}</p>` : ""}
+          <button class="logout-btn" onclick="window.location.href='/logout'">Logout</button>
+        `;
+      } catch (err) {
+        console.error("Error loading profile:", err);
         window.location.href = "/login.html";
-        return;
       }
-
-      const user = await response.json();
-
-      document.getElementById("profile-card").innerHTML = `
-        <img src="${user.photos?.[0]?.value || 'https://via.placeholder.com/100'}" class="profile-pic" alt="User Avatar">
-        <h2>${user.displayName || user.username || "Anonymous"}</h2>
-        ${user.emails ? `<p><strong>Email:</strong> ${user.emails[0].value}</p>` : ""}
-        <button class="logout-btn" onclick="logout()">Logout</button>
-      `;
-    } catch (err) {
-      console.error("Failed to fetch user:", err);
-      window.location.href = "/login.html";
     }
-  });
 
-  function logout() {
-    window.location.href = "/logout"; // Calls backend logout route
-  }
-</script>
-
+    loadProfile();
+  </script>
 </body>
 </html>
