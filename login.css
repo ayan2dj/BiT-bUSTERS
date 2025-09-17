@@ -1,64 +1,93 @@
-/* General Page Styling */
 body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #f5f7fa;
-  margin: 0;
-  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  margin: 0;
 }
 
-/* Container for Login */
-.login-container {
-  background: #ffffff;
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+h2 {
   text-align: center;
-  max-width: 350px;
-  width: 90%;
-}
-
-h1 {
-  margin-bottom: 25px;
-  color: #222;
-  font-size: 1.8rem;
-  font-weight: 600;
-}
-
-/* Google Sign-In Button container */
-.g_id_signin {
-  display: flex;
-  justify-content: center;
+  color: teal;
   margin-bottom: 20px;
 }
 
-/* GitHub Button */
-.github-btn {
-  background: #24292e;
-  color: white;
-  font-size: 16px;
-  font-weight: 500;
-  padding: 10px 20px;
+.login-box {
+  border: 2px solid #000;
+  border-radius: 12px;
+  padding: 30px;
+  width: 320px;
+  background: #fff;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.login-box h3 {
+  color: #7b4f00;
+  margin-bottom: 20px;
+}
+
+.login-box label {
+  display: block;
+  text-align: left;
+  margin: 8px 0 4px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.register {
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.register a {
+  color: purple;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 8px;
   border: none;
-  border-radius: 6px;
+  font-size: 15px;
   cursor: pointer;
-  transition: background 0.3s ease-in-out;
+  color: #000;
+  font-weight: bold;
 }
 
-.github-btn:hover {
-  background: #333;
+.google-btn {
+  background: linear-gradient(to right, #fff, #cce0ff);
+  border: 1px solid #ccc;
 }
 
-/* Responsive Design */
-@media (max-width: 500px) {
-  .login-container {
-    padding: 25px;
-  }
+.google-btn img {
+  width: 20px;
+  margin-right: 8px;
+}
 
-  h1 {
-    font-size: 1.5rem;
-  }
+.github-btn {
+  background: linear-gradient(to right, #fff, #cce0ff);
+  border: 1px solid #ccc;
+}
+
+.github-btn img {
+  width: 20px;
+  margin-right: 8px;
 }
